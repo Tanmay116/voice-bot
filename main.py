@@ -1,8 +1,10 @@
 # import os
 import ollama
-from fastrtc import (ReplyOnPause, Stream, get_stt_model, get_tts_model)
+from fastrtc import (ReplyOnPause, Stream,  get_tts_model)
 # from groq import Groq
 from dotenv import load_dotenv
+from fastrtc_whisper_cpp import get_stt_model
+
 load_dotenv()
 
 # client = Groq()
@@ -29,13 +31,15 @@ def echo(audio):
     # )
     # prompt = response.choices[0].message.content
     response = ollama.chat(
-    model='qwen3:0.6b',
-    messages=[
-        {'role': 'system', 'content': 'You are a helpful voice assistant. Be extremely concise. Use 1-2 short sentences maximum. Speak naturally like a human in a quick conversation. No bullet points or long explanations'},
-        {'role': 'user', 'content': prompt}],
-    think=False
-)
+        # model='qwen3:0.6b',
+        model='llama3.2:1b',
+        messages=[
+            {'role': 'system', 'content': 'You are a helpful voice assistant. Be extremely concise. Use 1-2 short sentences maximum. Speak naturally like a human in a quick conversation. No bullet points or long explanations'},
+            {'role': 'user', 'content': prompt}],
+        # think=False
+    )
     prompt = response['message']['content']
+    print(f"response: {prompt}")
     for audio_chunk in tts_model.stream_tts_sync(prompt):
         yield audio_chunk
 
