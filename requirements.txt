@@ -1,0 +1,9 @@
+# "git+https://github.com/femelo/py-qwen3-asr-cpp"
+langchain==1.2.10
+langchain-ollama==1.0.1
+fastrtc==0.0.34
+python-dotenv==1.2.1
+fastrtc-whisper-cpp==0.1.2
+langchain_community==0.4.1
+duckduckgo-search==8.1.1
+ddgs==9.10.0

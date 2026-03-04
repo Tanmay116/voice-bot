@@ -3,14 +3,26 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables import RunnableConfig
+# from fastrtc_kroko import get_stt_model
 from fastrtc import (ReplyOnPause, Stream, KokoroTTSOptions, get_tts_model)
 from dotenv import load_dotenv
 from fastrtc_whisper_cpp import get_stt_model
+from langchain_community.tools import DuckDuckGoSearchRun, DuckDuckGoSearchResults
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
+
+wrapper = DuckDuckGoSearchAPIWrapper(region="in-en", time="d", max_results=5, safesearch="off", source="text")
+
+search = DuckDuckGoSearchResults(api_wrapper=wrapper, output_format="list")
 
 load_dotenv()
 checkpointer = InMemorySaver()
+import os
+
 # llm = ChatOllama(model='llama3.2:1b')
-llm = ChatOllama(model='hf.co/lm-kit/gemma-3-4b-instruct-gguf:Q4_K_M')
+# llm = ChatOllama(model='hf.co/lm-kit/gemma-3-4b-instruct-gguf:Q4_K_M')
+
+ollama_base_url = os.getenv("OLLAMA_HOST")
+llm = ChatOllama(model='qwen3.5:0.8b', base_url=ollama_base_url, think=False)
 
 agent = create_agent(
     model=llm,

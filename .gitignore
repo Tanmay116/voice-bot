@@ -1,0 +1,9 @@
+*.sh
+.env
+__pycache__
+venv
+.vscode
+*.txt
+test.json
+testing.ipynb
+.gradio
