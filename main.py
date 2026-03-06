@@ -40,8 +40,8 @@ llm = ChatOllama(model='qwen3.5:0.8b', base_url=ollama_base_url, think=False)
 
 agent = create_agent(
     model=llm,
-    tools=[],
-    system_prompt="You are an expert Indian financial advisor on a phone call. Use brief, natural sentences to discuss NSE and BSE stocks. Be extremely concise—maximum 1 to 2 short sentences. No lists or disclaimers unless asked. Speak like a quick, helpful human.",
+    tools=[search],
+    system_prompt="You are an expert Indian financial advisor on a phone call. Use brief, natural sentences to discuss NSE and BSE stocks. Be extremely concise—maximum 1 to 2 short sentences. No lists or disclaimers unless asked. Speak like a quick, helpful human. invoke the search api call whenever you are unsure about the current data",
     middleware=[
         SummarizationMiddleware(
             model=llm,
@@ -64,13 +64,15 @@ config: RunnableConfig = {"configurable": {"thread_id": "1"}}
 stt_model = get_stt_model()
 tts_model = get_tts_model()
 
-def echo(audio):
+async def echo(audio):
     prompt = stt_model.stt(audio)
     logger.info(f"Here is your prompt: {prompt}")
-    response = agent.invoke({"messages": prompt},config)
+
+    response = await agent.ainvoke({"messages": prompt},config)
+
     prompt = response["messages"][-1].content
     logger.info(f"response: {prompt}")
-    for audio_chunk in tts_model.stream_tts_sync(prompt, options=options):
+    async for audio_chunk in tts_model.stream_tts(prompt, options=options):
         yield audio_chunk
 
 stream = Stream(ReplyOnPause(echo), modality="audio", mode="send-receive")
