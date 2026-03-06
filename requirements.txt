@@ -7,3 +7,4 @@ fastrtc-whisper-cpp==0.1.2
 langchain_community==0.4.1
 duckduckgo-search==8.1.1
 ddgs==9.10.0
+kokoro-onnx==0.5.0

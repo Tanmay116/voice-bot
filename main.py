@@ -9,6 +9,21 @@ from dotenv import load_dotenv
 from fastrtc_whisper_cpp import get_stt_model
 from langchain_community.tools import DuckDuckGoSearchRun, DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
+import logging
+import os
+
+logger = logging.getLogger("voicebot_logs")
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler("voicebot.log")
+file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] - %(name)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+logger.addHandler(file_handler)
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] - %(name)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+)
+logger.addHandler(stream_handler)
+
 
 wrapper = DuckDuckGoSearchAPIWrapper(region="in-en", time="d", max_results=5, safesearch="off", source="text")
 
@@ -16,7 +31,6 @@ search = DuckDuckGoSearchResults(api_wrapper=wrapper, output_format="list")
 
 load_dotenv()
 checkpointer = InMemorySaver()
-import os
 
 # llm = ChatOllama(model='llama3.2:1b')
 # llm = ChatOllama(model='hf.co/lm-kit/gemma-3-4b-instruct-gguf:Q4_K_M')
@@ -52,10 +66,10 @@ tts_model = get_tts_model()
 
 def echo(audio):
     prompt = stt_model.stt(audio)
-    print(f"Here is your prompt: {prompt}")
+    logger.info(f"Here is your prompt: {prompt}")
     response = agent.invoke({"messages": prompt},config)
     prompt = response["messages"][-1].content
-    print(f"response: {prompt}")
+    logger.info(f"response: {prompt}")
     for audio_chunk in tts_model.stream_tts_sync(prompt, options=options):
         yield audio_chunk
 
